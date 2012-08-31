@@ -569,4 +569,14 @@ public class InspectionStub
     {
 	return -1; //TODO
     }
+
+    /**
+     * @see IInspectionService.loadMacro
+     */
+    public void loadMacro
+	(String macro)
+	throws RemoteException
+    {
+	//TODO
+    }
 }

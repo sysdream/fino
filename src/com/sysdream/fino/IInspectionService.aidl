@@ -299,4 +299,15 @@ interface IInspectionService
 	 in int[] path,
 	 in int macro,
 	 in int[] params);
+
+    /**
+     * Load a new macro;
+     *
+     * Load a macro from a remote application. The macro must be sent
+     * as a loadable dex class implementing the <code>IMacro</code>
+     * interface. The string must be base64 encoded.
+     * @param macro the loaded macro
+     */
+    void loadMacro
+	(in String macro);
 }
