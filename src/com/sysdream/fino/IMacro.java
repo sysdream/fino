@@ -35,7 +35,7 @@ interface IMacro
      *
      * @return a parameter type list
      */
-    Class<?> getParameters
+    Class<?>[] getParameters
 	();
 
     /**
@@ -47,5 +47,6 @@ interface IMacro
      * @return the macro returned object
      */
     Object run
-	(Object[] parameters);
+	(Object target,
+	 Object[] parameters);
 }

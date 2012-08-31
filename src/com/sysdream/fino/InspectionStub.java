@@ -27,6 +27,11 @@ public class InspectionStub
     private ArrayList<Object> entryPoints;
 
     /**
+     * List of available macro instances
+     */
+    private ArrayList<IMacro> macros = new ArrayList<IMacro>();
+
+    /**
      * Constructor
      *
      * @param entryPoints reference to the entry point list
@@ -533,48 +538,72 @@ public class InspectionStub
 	()
 	throws RemoteException
     {
-	return null; //TODO
+	final Vector<String> result = new Vector<String>();
+	for(final IMacro macro: macros) {
+	    result.add(macro.getClass().getName());
+	}
+	return result.toArray(new String[result.size()]);
     }
 
     /**
      * @see IInspectionService.filterMacros
      */
     public int[] filterMacros
-	(int entryPoint,
-	 int[] path)
+	(final int entryPoint,
+	 final int[] path)
 	throws RemoteException
     {
-	return null; //TODO
+	final Object o = resolvePath(entryPoint, path);
+	final Vector<Integer> compatible = new Vector<Integer>();
+	for(int i = 0; i < macros.size(); i++) {
+	    if(macros.get(i).isCompatible(o)) {
+		compatible.add(i);
+	    }
+	}
+	final int[] result = new int[compatible.size()];
+	for(int i = 0; i < result.length; i++) {
+	    result[i] = compatible.get(i);
+	}
+	return result;
     }
 
     /**
      * @see IInspectionService.getMacrosParams
      */
     public String[] getMacroParams
-	(int macro)
+	(final int macro)
 	throws RemoteException
     {
-	return null; //TODO
+	final Vector<String> result = new Vector<String>();
+	for(final Class<?> param: macros.get(macro).getParameters()) {
+	    result.add(param.getName());
+	}
+	return result.toArray(new String[result.size()]);
     }
 
     /**
      * @see IInspectionService.runMacro
      */
     public int runMacro
-	(int entryPoint,
-	 int[] path,
-	 int macro,
-	 int[] params)
+	(final int entryPoint,
+	 final int[] path,
+	 final int macro,
+	 final int[] params)
 	throws RemoteException
     {
-	return -1; //TODO
+	Object[] p = new Object[params.length];
+	for(int i = 0; i < params.length; i++) {
+	    p[i] = entryPoints.get(params[i]);
+	}
+	return pushObject(macros.get(macro).run
+			  (resolvePath(entryPoint, path), p));
     }
 
     /**
      * @see IInspectionService.loadMacro
      */
     public void loadMacro
-	(String macro)
+	(final String macro)
 	throws RemoteException
     {
 	//TODO
