@@ -2,8 +2,12 @@ package com.sysdream.fino;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
 
 import android.os.RemoteException;
+
+import dalvik.system.DexClassLoader;
 
 /**
  * Main logics for the inspection service, actual implementation of the
@@ -32,14 +36,28 @@ public class InspectionStub
     private ArrayList<IMacro> macros = new ArrayList<IMacro>();
 
     /**
+     * Dex macros storage path
+     */
+    private File dexStorage;
+
+    /**
+     * Dex class loader
+     */
+    private DexClassLoader loader;
+
+    /**
      * Constructor
      *
      * @param entryPoints reference to the entry point list
      */
     public InspectionStub
-	(ArrayList<Object> entryPoints)
+	(ArrayList<Object> entryPoints,
+	 File dexStorage,
+	 DexClassLoader loader)
     {
 	this.entryPoints = entryPoints;
+	this.dexStorage = dexStorage;
+	this.loader = loader;
     }
 
     /**
@@ -603,9 +621,30 @@ public class InspectionStub
      * @see IInspectionService.loadMacro
      */
     public void loadMacro
-	(final String macro)
+	(final String name,
+	 final byte[] dex)
 	throws RemoteException
     {
-	//TODO
+	/*
+	 * Remove existing macro if updating
+	 */
+	for(IMacro macro: macros) {
+	    if(macro.getClass().getName() == name) {
+		macros.remove(macro);
+	    }
+	}
+	/*
+	 * Then try and load the class
+	 */
+	try {
+	    final FileOutputStream fos = new FileOutputStream(dexStorage);
+	    fos.write(dex);
+	    fos.close();
+	    Class clazz = loader.loadClass(name);
+	    macros.add((IMacro) clazz.newInstance());
+	}
+	catch(Exception e) {
+	    e.printStackTrace(); //TODO debug
+	}
     }
 }

@@ -1,13 +1,17 @@
 package com.sysdream.fino;
 
 import java.util.ArrayList;
+import java.io.File;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.Context;
 import android.os.IBinder;
 import android.os.Bundle;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.app.Activity;
+
+import dalvik.system.DexClassLoader;
 
 /**
  * Provide a full featured remote inspection interface as specified in the
@@ -120,6 +124,23 @@ public class InspectionService
     public IBinder onBind
 	(final Intent e)
     {
-	return new InspectionStub(entryPoints);
+	/*
+	 * Class loader for dynamic macro loading
+	 */
+	final File internal = new File
+	    (getDir("dex", Context.MODE_PRIVATE), "macros.dx");
+	final File optimized = getDir("outdex", Context.MODE_PRIVATE);
+	DexClassLoader loader = new DexClassLoader
+	    (internal.getAbsolutePath(),
+	     optimized.getAbsolutePath(),
+	     null,
+	     getClassLoader());
+	/*
+	 * Initializing the actual service
+	 */
+	return new InspectionStub
+	    (entryPoints,
+	     internal,
+	     loader);
     }
 }

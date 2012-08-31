@@ -309,5 +309,6 @@ interface IInspectionService
      * @param macro the loaded macro
      */
     void loadMacro
-	(in String macro);
+	(in String name,
+	 in byte[] dex);
 }
