@@ -29,7 +29,7 @@ package com.sysdream.fino;
  * @author <a href="mailto:p.jaury@sysdream.com">Pierre Jaury</a>
  * @version 1.0
  */
-interface IIntrospectionService
+interface IInspectionService
 {
     /**
      * List registered entry points.
@@ -282,7 +282,7 @@ interface IIntrospectionService
      * @param macro the macro index from the macro list
      * @return list of macro parameter names and types
      */
-    String[] getMacrosParams
+    String[] getMacroParams
 	(in int macro);
 
     /**
