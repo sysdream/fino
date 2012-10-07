@@ -11,5 +11,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+	<service android:name="com.sysdream.fino.InspectionService">
+	  <intent-filter>
+	    <action android:name="com.sysdream.fino.inspection" />
+	  </intent-filter>
+	</service>
     </application>
 </manifest>
