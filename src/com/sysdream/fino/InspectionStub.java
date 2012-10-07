@@ -380,7 +380,8 @@ public class InspectionStub
     public String[] getMethodParams
 	(final int entryPoint,
 	 final int[] path,
-	 final int method)
+	 final int method,
+	 final int[] parameters)
 	throws RemoteException
     {
 	final Class<?>[] params = listMethods(resolvePath(entryPoint, path))
@@ -388,7 +389,13 @@ public class InspectionStub
 	    .getParameterTypes();
 	String[] result = new String[params.length];
 	for(int i = 0; i < params.length; i++) {
-	    result[i] = params[i].getName();
+	    result[i] = "";
+	    if(parameters.length == params.length) {
+		result[i] += (parameters[i] >= 0) ?
+		    entryPoints.get(parameters[i]).toString() : "-";
+		result[i] += SEPARATOR;
+	    }
+	    result[i] += params[i].getName();
 	}
 	return result;
     }

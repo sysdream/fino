@@ -147,15 +147,21 @@ interface IInspectionService
     /**
      * Get a list of method parameter types.
      *
+     * If the parameters list is empty or misformed, then the raw list
+     * of parameter types is returned. Otherwise, a typed list of current
+     * parameter values is returned.
+     *
      * @param entryPoint the reference entry point
      * @param path the path from entry point
      * @param method the method index from method list
+     * @param parameters current parameter values
      * @return a list of <code>String</code> description of parameter types
      */
     String[] getMethodParams
 	(in int entryPoint,
 	 in int[] path,
-	 in int method);
+	 in int method,
+	 in int[] parameters);
 
     /**
      * Invoke a method given the provided parameters.
