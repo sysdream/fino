@@ -354,7 +354,7 @@ public class InspectionStub
 	if(path.length > 0) {
 	    final int[] parent = new int[path.length - 1];
 	    System.arraycopy(path, 0, parent, 0, parent.length);
-	    set(browsePath(entryPoint, path).get(path.length),
+	    set(browsePath(entryPoint, parent).get(path[parent.length]),
 		resolvePath(entryPoint, parent),
 		entryPoints.get(value));
 	}
