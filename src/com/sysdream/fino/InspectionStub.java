@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import android.os.RemoteException;
+import android.os.Handler;
+import android.os.Looper;
 
 import dalvik.system.DexClassLoader;
 
@@ -46,6 +48,11 @@ public class InspectionStub
     private DexClassLoader loader;
 
     /**
+     * UI Handler
+     */
+    private Handler handler;
+
+    /**
      * Constructor
      *
      * @param entryPoints reference to the entry point list
@@ -58,6 +65,7 @@ public class InspectionStub
 	this.entryPoints = entryPoints;
 	this.dexStorage = dexStorage;
 	this.loader = loader;
+    this.handler = new Handler(Looper.getMainLooper());
     }
 
     /**
@@ -425,9 +433,30 @@ public class InspectionStub
 	 */
 	Object result = null;
 	try {
+        /* Try a classic method invocation ... */
 	    result = m.invoke(resolvePath(entryPoint, path), params);
 	} catch (Exception e) {
-	    e.printStackTrace();
+        /* ... if it fails, then try to invoke it on the UI thread
+         * NOTE: the method will return null since it is an asynchronous
+         * invocation.
+         *
+         * TODO: Restrict this part of code only to CalledFromWrongThreadException
+         */
+        try {
+            /* Launch a Runnable inside the UI thread */
+            InspectionStub.this.handler.post(new Runnable(){
+                public void run() {
+                    try {
+                        /* Invoke the target method */
+                        m.invoke(resolvePath(entryPoint, path), params);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
 	}
 	/*
 	 * If the result is null, return -1, otherwise store to the entry points
