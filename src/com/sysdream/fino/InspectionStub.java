@@ -4,7 +4,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.io.File;
 import java.io.FileOutputStream;
-
+import android.util.Log;
 import android.os.RemoteException;
 import android.os.Handler;
 import android.os.Looper;
@@ -65,7 +65,7 @@ public class InspectionStub
 	this.entryPoints = entryPoints;
 	this.dexStorage = dexStorage;
 	this.loader = loader;
-    this.handler = new Handler(Looper.getMainLooper());
+    this.handler = new Handler();
     }
 
     /**
@@ -104,6 +104,69 @@ public class InspectionStub
 	catch(final Exception e) {
 	}
     }
+
+    /**
+     * Invoke method of an endpoint
+     *
+     * @param object the object where the method is declared
+     * @param method method name
+     * @param params parameters array
+     * @return entryPoint index or <0 if an error occured 
+     */
+    public int invoke
+    (final Object object,
+     final Method method,
+     final Object[] params)
+    throws IllegalArgumentException
+    {
+	/*
+	 * Call the method
+	 */
+	Object result = null;
+	try {
+        /* Try a classic method invocation ... */
+	    result = method.invoke(object, params);
+	}
+    catch (IllegalArgumentException e) {
+        throw e;
+    }
+    catch (Exception e) {
+        /* ... if it fails, then try to invoke it on the UI thread
+         * NOTE: the method will return null since it is an asynchronous
+         * invocation.
+         *
+         * TODO: Restrict this part of code only to CalledFromWrongThreadException
+         */
+        try {
+            /* Launch a Runnable inside the UI thread */
+            InspectionStub.this.handler.post(new Runnable(){
+                public void run() {
+                    try {
+                        /* Invoke the target method */
+                        method.invoke(object, params);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+	}
+	/*
+	 * If the result is null, return -1, otherwise store to the entry points
+	 * stack and return the identifier
+	 */
+	if(result != null) {
+	    entryPoints.add(result);
+	    return entryPoints.indexOf(result);
+	}
+	else {
+	    return -1;
+	}
+    }
+
+
 
     /**
      * List every field for an object type.
@@ -167,6 +230,59 @@ public class InspectionStub
 	 final int[] path)
     {
 	return listMethods(resolvePath(entryPoint, path));
+    }
+
+    /**
+     * List constructors for a class
+     *
+     * @param className the class name
+     * @return a list of <code>Constructor</code> objects
+     */
+    private Vector<Constructor> listConstructors
+    (String className)
+    {
+    final Vector<Constructor> result = new Vector<Constructor>();
+    try {
+        Class<?> c = Class.forName(className);
+        while (c != Object.class) {
+            result.addAll(Arrays.asList(c.getConstructors()));
+            c = c.getSuperclass();
+        }
+    } catch (ClassNotFoundException e) {
+    }
+    return result;
+    }
+
+    /**
+     * List classes for a class
+     * 
+     * @param o the object
+     * @return the list of classes declared by the object
+     */
+    private Vector<Class> listClasses
+    (Object o)
+    {
+	final Vector<Class> result = new Vector<Class>();
+	Class<?> c = o.getClass();
+	while(c != Object.class) {
+	    result.addAll(Arrays.asList(c.getDeclaredClasses()));
+	    c = c.getSuperclass();
+	}
+	return result;
+    }
+
+    /**
+     * List classes for a class
+     *
+     * @param entryPoint the reference entry point
+     * @param path the path from the entry point
+     * @return a list of <code>Class</code> objects
+     */
+    private Vector<Class> listClasses
+    (final int entryPoint,
+     final int[] path)
+    {
+    return listClasses(resolvePath(entryPoint, path));
     }
 
     /**
@@ -297,6 +413,23 @@ public class InspectionStub
     }
 
     /**
+     * @see IInspectionService.getClasses
+     */
+    public String[] getClasses
+    (final int entryPoint,
+     final int[] path)
+    throws RemoteException
+    {
+    final Vector<String> result = new Vector<String>();
+    for(final Class c: listClasses(entryPoint, path)) {
+        result.add(c.getName()
+                + SEPARATOR
+                + c.toString());
+    }
+    return result.toArray(new String[]{});
+    }
+
+    /**
      * @see IInspectionService.getMethods
      */
     public String[] getMethods
@@ -311,6 +444,41 @@ public class InspectionStub
 		       + m.toString());
 	}
 	return result.toArray(new String[]{});
+    }
+
+    /**
+     * @see IInspectionService.newInstance
+     */
+    public int newInstance
+    (final String className,
+     final int[] paramsId)
+    {
+    Object o = null;
+    final Object[] params = new Object[paramsId.length];
+	for(int i = 0; i < params.length; i++) {
+	    params[i] = entryPoints.get(paramsId[i]);
+	}
+
+    /* List constructors */
+    for(final Constructor c: listConstructors(className)) {
+        try {
+            if (c.getParameterTypes().length == params.length) {
+                o = c.newInstance(params);
+                /* Push as an entrypoint */
+                if (o != null)
+                    return pushObject(o);
+            }
+        } catch(InstantiationException e) {
+            return -1;
+        } catch(IllegalArgumentException e) {
+        } catch(InvocationTargetException e) {
+            return -2;
+        } catch(Exception e) {
+            return -3;
+        }
+    }
+    /* Error */
+    return -1;
     }
 
     /**
@@ -362,7 +530,7 @@ public class InspectionStub
 	if(path.length > 0) {
 	    final int[] parent = new int[path.length - 1];
 	    System.arraycopy(path, 0, parent, 0, parent.length);
-	    set(browsePath(entryPoint, parent).get(path[parent.length]),
+	    set(browsePath(entryPoint, path).get(parent.length),
 		resolvePath(entryPoint, parent),
 		entryPoints.get(value));
 	}
@@ -408,6 +576,7 @@ public class InspectionStub
 	return result;
     }
 
+
     /**
      * @see IInspectionService.invokeMethod
      */
@@ -431,45 +600,43 @@ public class InspectionStub
 	/*
 	 * Call the method
 	 */
-	Object result = null;
-	try {
-        /* Try a classic method invocation ... */
-	    result = m.invoke(resolvePath(entryPoint, path), params);
-	} catch (Exception e) {
-        /* ... if it fails, then try to invoke it on the UI thread
-         * NOTE: the method will return null since it is an asynchronous
-         * invocation.
-         *
-         * TODO: Restrict this part of code only to CalledFromWrongThreadException
-         */
-        try {
-            /* Launch a Runnable inside the UI thread */
-            InspectionStub.this.handler.post(new Runnable(){
-                public void run() {
-                    try {
-                        /* Invoke the target method */
-                        m.invoke(resolvePath(entryPoint, path), params);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        } catch (Exception e2) {
-            e2.printStackTrace();
-        }
-	}
-	/*
-	 * If the result is null, return -1, otherwise store to the entry points
-	 * stack and return the identifier
-	 */
-	if(result != null) {
-	    entryPoints.add(result);
-	    return entryPoints.indexOf(result);
-	}
-	else {
-	    return -1;
-	}
+    try {
+        return this.invoke(resolvePath(entryPoint, path), m, params);
+    } catch (IllegalArgumentException e) {
+        return -1;
     }
+    }
+
+    /**
+     * @see IInspectionService.invokeMethodByName
+     */
+    public int invokeMethodByName
+	(final int entryPoint,
+     final int[] path,
+	 final String method,
+	 final int[] paramsId)
+	throws RemoteException
+    {
+    /* Build the parameters objects */
+    final Object[] params = new Object[paramsId.length];
+    for(int i = 0; i < params.length; i++) {
+        params[i] = entryPoints.get(paramsId[i]);
+    }
+    
+    Object o = resolvePath(entryPoint, path);
+    /* Loop on methods with the same name and try all of them */
+    for (Method m : listMethods(o)) {
+        if (m.getName().equals(method)) {
+            m.setAccessible(true);
+            try {
+                return this.invoke(o, m, params);
+            } catch (IllegalArgumentException e) {
+            }
+        }
+    }
+    return -2;
+    }
+
 
     /**
      * @see IInspectionService.isIterable

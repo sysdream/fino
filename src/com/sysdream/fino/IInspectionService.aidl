@@ -80,6 +80,32 @@ interface IInspectionService
 	 in int[] path);
 
     /**
+     * List classes available for the referenced object.
+     * 
+     * The class list is returned in the "<full name>:<name>" format.
+     *
+     * @param entryPoint the referrence entry point
+     * @param path the path from entry point
+     * @return the list of accessible classes
+     */
+    String[] getClasses
+    (in int entryPoint,
+     in int[] path);
+
+    /**
+     * Create a new instance of a given type.
+     *
+     * The entry point index of the newly created instance.
+     *
+     * @param className the target class name
+     * @param params parameters to pass to the constructor
+     * @return the list of accessible constructors
+     */
+    int newInstance
+    (in String className,
+     in int[] paramsId);
+
+    /**
      * Generate a descriptive value of the path from the entry point.
      *
      * @param entryPoint the reference entry point
@@ -182,6 +208,26 @@ interface IInspectionService
 	 in int[] path,
 	 in int method,
 	 in int[] parameters);
+
+    /**
+     * Invoke a method given the provided parameters.
+     *
+     * Parameters must be provided as a list of index from the entry point
+     * list. Thus, only entry points may be used as method parameters. The
+     * result is returned as an entry point as well. See the <code>push</code>
+     * method for creating entry point.
+     *
+     * @param entryPoint the reference entry point
+     * @param method the method name to invoke
+     * @param parameters the parameter list
+     * @return index of the method result in the entry point list
+     */
+    int invokeMethodByName
+	(in int entryPoint,
+     in int[] path,
+     in String method,
+	 in int[] parameters);
+
 
     /**
      * Check if the referenced object is iterable.
