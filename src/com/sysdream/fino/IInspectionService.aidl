@@ -81,7 +81,7 @@ interface IInspectionService
 
     /**
      * List classes available for the referenced object.
-     * 
+     *
      * The class list is returned in the "<full name>:<name>" format.
      *
      * @param entryPoint the referrence entry point
@@ -89,21 +89,19 @@ interface IInspectionService
      * @return the list of accessible classes
      */
     String[] getClasses
-    (in int entryPoint,
-     in int[] path);
+	(in int entryPoint,
+	 in int[] path);
 
     /**
      * Create a new instance of a given type.
      *
-     * The entry point index of the newly created instance.
-     *
      * @param className the target class name
      * @param params parameters to pass to the constructor
-     * @return the list of accessible constructors
+     * @return index of the entry point for the new instance
      */
     int newInstance
-    (in String className,
-     in int[] paramsId);
+	(in String className,
+	 in int[] paramsId);
 
     /**
      * Generate a descriptive value of the path from the entry point.
@@ -224,8 +222,8 @@ interface IInspectionService
      */
     int invokeMethodByName
 	(in int entryPoint,
-     in int[] path,
-     in String method,
+	 in int[] path,
+	 in String method,
 	 in int[] parameters);
 
 

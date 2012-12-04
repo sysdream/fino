@@ -65,7 +65,7 @@ public class InspectionStub
 	this.entryPoints = entryPoints;
 	this.dexStorage = dexStorage;
 	this.loader = loader;
-    this.handler = new Handler();
+	this.handler = new Handler();
     }
 
     /**
@@ -111,47 +111,47 @@ public class InspectionStub
      * @param object the object where the method is declared
      * @param method method name
      * @param params parameters array
-     * @return entryPoint index or <0 if an error occured 
+     * @return entryPoint index or less than 0 if an error occured
      */
     public int invoke
-    (final Object object,
-     final Method method,
-     final Object[] params)
-    throws IllegalArgumentException
+	(final Object object,
+	 final Method method,
+	 final Object[] params)
+	throws IllegalArgumentException
     {
 	/*
 	 * Call the method
 	 */
 	Object result = null;
 	try {
-        /* Try a classic method invocation ... */
+	    /* Try a classic method invocation ... */
 	    result = method.invoke(object, params);
 	}
-    catch (IllegalArgumentException e) {
-        throw e;
-    }
-    catch (Exception e) {
-        /* ... if it fails, then try to invoke it on the UI thread
-         * NOTE: the method will return null since it is an asynchronous
-         * invocation.
-         *
-         * TODO: Restrict this part of code only to CalledFromWrongThreadException
-         */
-        try {
-            /* Launch a Runnable inside the UI thread */
-            InspectionStub.this.handler.post(new Runnable(){
-                public void run() {
-                    try {
-                        /* Invoke the target method */
-                        method.invoke(object, params);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        } catch (Exception e2) {
-            e2.printStackTrace();
-        }
+	catch (IllegalArgumentException e) {
+	    throw e;
+	}
+	catch (Exception e) {
+	    /* ... if it fails, then try to invoke it on the UI thread
+	     * NOTE: the method will return null since it is an asynchronous
+	     * invocation.
+	     *
+	     * TODO: Restrict this part to CalledFromWrongThreadException
+	     */
+	    try {
+		/* Launch a Runnable inside the UI thread */
+		handler.post(new Runnable(){
+			public void run() {
+			    try {
+				/* Invoke the target method */
+				method.invoke(object, params);
+			    } catch (Exception e) {
+				e.printStackTrace();
+			    }
+			}
+		    });
+	    } catch (Exception e2) {
+		e2.printStackTrace();
+	    }
 	}
 	/*
 	 * If the result is null, return -1, otherwise store to the entry points
@@ -239,23 +239,23 @@ public class InspectionStub
      * @return a list of <code>Constructor</code> objects
      */
     private Vector<Constructor> listConstructors
-    (String className)
+	(String className)
     {
-    final Vector<Constructor> result = new Vector<Constructor>();
-    try {
-        Class<?> c = Class.forName(className);
-        while (c != Object.class) {
-            result.addAll(Arrays.asList(c.getConstructors()));
-            c = c.getSuperclass();
-        }
-    } catch (ClassNotFoundException e) {
-    }
-    return result;
+	final Vector<Constructor> result = new Vector<Constructor>();
+	try {
+	    Class<?> c = Class.forName(className);
+	    while (c != Object.class) {
+		result.addAll(Arrays.asList(c.getConstructors()));
+		c = c.getSuperclass();
+	    }
+	} catch (ClassNotFoundException e) {
+	}
+	return result;
     }
 
     /**
      * List classes for a class
-     * 
+     *
      * @param o the object
      * @return the list of classes declared by the object
      */
@@ -279,10 +279,10 @@ public class InspectionStub
      * @return a list of <code>Class</code> objects
      */
     private Vector<Class> listClasses
-    (final int entryPoint,
-     final int[] path)
+	(final int entryPoint,
+	 final int[] path)
     {
-    return listClasses(resolvePath(entryPoint, path));
+	return listClasses(resolvePath(entryPoint, path));
     }
 
     /**
@@ -416,17 +416,17 @@ public class InspectionStub
      * @see IInspectionService.getClasses
      */
     public String[] getClasses
-    (final int entryPoint,
-     final int[] path)
-    throws RemoteException
+	(final int entryPoint,
+	 final int[] path)
+	throws RemoteException
     {
-    final Vector<String> result = new Vector<String>();
-    for(final Class c: listClasses(entryPoint, path)) {
-        result.add(c.getName()
-                + SEPARATOR
-                + c.toString());
-    }
-    return result.toArray(new String[]{});
+	final Vector<String> result = new Vector<String>();
+	for(final Class c: listClasses(entryPoint, path)) {
+	    result.add(c.getName()
+		       + SEPARATOR
+		       + c.toString());
+	}
+	return result.toArray(new String[]{});
     }
 
     /**
@@ -450,35 +450,34 @@ public class InspectionStub
      * @see IInspectionService.newInstance
      */
     public int newInstance
-    (final String className,
-     final int[] paramsId)
+	(final String className,
+	 final int[] paramsId)
     {
-    Object o = null;
-    final Object[] params = new Object[paramsId.length];
+	Object o = null;
+	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
 	    params[i] = entryPoints.get(paramsId[i]);
 	}
-
-    /* List constructors */
-    for(final Constructor c: listConstructors(className)) {
-        try {
-            if (c.getParameterTypes().length == params.length) {
-                o = c.newInstance(params);
-                /* Push as an entrypoint */
-                if (o != null)
-                    return pushObject(o);
-            }
-        } catch(InstantiationException e) {
-            return -1;
-        } catch(IllegalArgumentException e) {
-        } catch(InvocationTargetException e) {
-            return -2;
-        } catch(Exception e) {
-            return -3;
-        }
-    }
-    /* Error */
-    return -1;
+	/* List constructors */
+	for(final Constructor c: listConstructors(className)) {
+	    try {
+		if (c.getParameterTypes().length == params.length) {
+		    o = c.newInstance(params);
+		    /* Push as an entrypoint */
+		    if (o != null)
+			return pushObject(o);
+		}
+	    } catch(InstantiationException e) {
+		return -1;
+	    } catch(IllegalArgumentException e) {
+	    } catch(InvocationTargetException e) {
+		return -2;
+	    } catch(Exception e) {
+		return -3;
+	    }
+	}
+	/* Error */
+	return -1;
     }
 
     /**
@@ -600,11 +599,11 @@ public class InspectionStub
 	/*
 	 * Call the method
 	 */
-    try {
-        return this.invoke(resolvePath(entryPoint, path), m, params);
-    } catch (IllegalArgumentException e) {
-        return -1;
-    }
+	try {
+	    return invoke(resolvePath(entryPoint, path), m, params);
+	} catch (IllegalArgumentException e) {
+	    return -1;
+	}
     }
 
     /**
@@ -612,29 +611,28 @@ public class InspectionStub
      */
     public int invokeMethodByName
 	(final int entryPoint,
-     final int[] path,
+	 final int[] path,
 	 final String method,
 	 final int[] paramsId)
 	throws RemoteException
     {
-    /* Build the parameters objects */
-    final Object[] params = new Object[paramsId.length];
-    for(int i = 0; i < params.length; i++) {
-        params[i] = entryPoints.get(paramsId[i]);
-    }
-    
-    Object o = resolvePath(entryPoint, path);
-    /* Loop on methods with the same name and try all of them */
-    for (Method m : listMethods(o)) {
-        if (m.getName().equals(method)) {
-            m.setAccessible(true);
-            try {
-                return this.invoke(o, m, params);
-            } catch (IllegalArgumentException e) {
-            }
-        }
-    }
-    return -2;
+	/* Build the parameters objects */
+	final Object[] params = new Object[paramsId.length];
+	for(int i = 0; i < params.length; i++) {
+	    params[i] = entryPoints.get(paramsId[i]);
+	}
+	Object o = resolvePath(entryPoint, path);
+	/* Loop on methods with the same name and try all of them */
+	for (Method m : listMethods(o)) {
+	    if (m.getName().equals(method)) {
+		m.setAccessible(true);
+		try {
+		    return invoke(o, m, params);
+		} catch (IllegalArgumentException e) {
+		}
+	    }
+	}
+	return -2;
     }
 
 
