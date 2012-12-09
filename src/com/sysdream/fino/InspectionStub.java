@@ -521,10 +521,11 @@ public class InspectionStub
 	}
 	else {
 	    Class<?> c = o.getClass();
-	    while(c != Object.class) {
-		result.add(o.getClass().getName());
-		    c = c.getSuperclass();
-	    }
+	    result.add(c.getName());
+	    do {
+		c = c.getSuperclass();
+		result.add(c.getName());
+	    } while(c != Object.class);
 	}
 	return result.toArray(new String[result.size()]);
     }
