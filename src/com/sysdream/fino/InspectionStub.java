@@ -507,6 +507,29 @@ public class InspectionStub
     }
 
     /**
+     * @see IInspectionService.getTypes
+     */
+    public String[] getTypes
+	(final int entryPoint,
+	 final int[] path)
+	throws RemoteException
+    {
+	final Vector<String> result = new Vector<String>();
+	final Object o = resolvePath(entryPoint, path);
+	if(o == null) {
+	    result.add("null");
+	}
+	else {
+	    Class<?> c = o.getClass();
+	    while(c != Object.class) {
+		result.add(o.getClass().getName());
+		    c = c.getSuperclass();
+	    }
+	}
+	return result.toArray(new String[result.size()]);
+    }
+
+    /**
      * @see IInspectionService.getValue
      */
     public String getValue

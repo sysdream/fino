@@ -125,6 +125,16 @@ interface IInspectionService
 	(in int entryPoint,
 	 in int[] path);
 
+    /**
+     * Describe the type hierarchy of the referenced object
+     *
+     * @param entryPoint the reference entry point
+     * @param path the path from entry point
+     * @return the described type hierary as a list of <code>String</code>
+     */
+    String[] getTypes
+	(in int entryPoint,
+	 in int[] path);
 
     /**
      * Get the <code>String</code> value of the referenced object.
