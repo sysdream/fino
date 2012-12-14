@@ -235,23 +235,38 @@ public class InspectionStub
     /**
      * List constructors for a class
      *
+     * @param clazz the class object
+     * @return a list of <code>Constructor</code> objects
+     */
+    private Vector<Constructor> listConstructors
+	(Class clazz)
+    {
+	final Vector<Constructor> result = new Vector<Constructor>();
+	while (clazz != Object.class) {
+	    result.addAll(Arrays.asList(clazz.getConstructors()));
+	    clazz = clazz.getSuperclass();
+	}
+	return result;
+    }
+
+
+    /**
+     * List constructors for a class name
+     *
      * @param className the class name
      * @return a list of <code>Constructor</code> objects
      */
     private Vector<Constructor> listConstructors
-	(String className)
+    (String className)
     {
-	final Vector<Constructor> result = new Vector<Constructor>();
-	try {
-	    Class<?> c = Class.forName(className);
-	    while (c != Object.class) {
-		result.addAll(Arrays.asList(c.getConstructors()));
-		c = c.getSuperclass();
-	    }
-	} catch (ClassNotFoundException e) {
-	}
-	return result;
+        try {
+            Class<?> c = Class.forName(className);
+            return listConstructors(c);
+        } catch(ClassNotFoundException e) {
+            return null;
+        }
     }
+
 
     /**
      * List classes for a class
@@ -450,7 +465,8 @@ public class InspectionStub
      * @see IInspectionService.newInstance
      */
     public int newInstance
-	(final String className,
+	(final int entryPoint,
+     final int[] path,
 	 final int[] paramsId)
     {
 	Object o = null;
@@ -459,7 +475,7 @@ public class InspectionStub
 	    params[i] = entryPoints.get(paramsId[i]);
 	}
 	/* List constructors */
-	for(final Constructor c: listConstructors(className)) {
+	for(final Constructor c: listConstructors((Class<?>)resolvePath(entryPoint, path))) {
 	    try {
 		if (c.getParameterTypes().length == params.length) {
 		    o = c.newInstance(params);
@@ -529,6 +545,23 @@ public class InspectionStub
 	}
 	return result.toArray(new String[result.size()]);
     }
+
+
+    /**
+     * @see IInspectionService.getClass
+     */
+    public int getClass
+    (final String className)
+    {
+        try {
+            Class<?> c = Class.forName(className);
+            return pushObject(c);
+        }
+        catch(ClassNotFoundException e) {
+            return -1;
+        }
+    }
+
 
     /**
      * @see IInspectionService.getValue
