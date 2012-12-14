@@ -100,7 +100,8 @@ interface IInspectionService
      * @return index of the entry point for the new instance
      */
     int newInstance
-	(in String className,
+	(in int entryPoint,
+     in int[] path,
 	 in int[] paramsId);
 
     /**
@@ -135,6 +136,17 @@ interface IInspectionService
     String[] getTypes
 	(in int entryPoint,
 	 in int[] path);
+
+
+    /**
+     * Retrieve a Class object corresponding to a class name
+     *
+     * @param className the class name
+     * @return the class as an entrypoint index
+     */
+    int getClass
+    (in String className);
+
 
     /**
      * Get the <code>String</code> value of the referenced object.
