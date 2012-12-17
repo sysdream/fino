@@ -586,9 +586,14 @@ public class InspectionStub
 	if(path.length > 0) {
 	    final int[] parent = new int[path.length - 1];
 	    System.arraycopy(path, 0, parent, 0, parent.length);
-	    set(browsePath(entryPoint, path).get(parent.length),
-		resolvePath(entryPoint, parent),
-		entryPoints.get(value));
+        if (value >= 0)
+	        set(browsePath(entryPoint, path).get(parent.length),
+		    resolvePath(entryPoint, parent),
+	    	entryPoints.get(value));
+        else
+            set(browsePath(entryPoint, path).get(parent.length),
+            resolvePath(entryPoint, parent),
+            null);
 	}
     }
 
@@ -651,7 +656,10 @@ public class InspectionStub
 	m.setAccessible(true);
 	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
-	    params[i] = entryPoints.get(paramsId[i]);
+        if (paramsId[i]<0)
+            params[i] = null;
+        else
+	        params[i] = entryPoints.get(paramsId[i]);
 	}
 	/*
 	 * Call the method
@@ -676,7 +684,10 @@ public class InspectionStub
 	/* Build the parameters objects */
 	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
-	    params[i] = entryPoints.get(paramsId[i]);
+        if (paramsId[i]<0)
+            params[i] = null;
+        else
+	        params[i] = entryPoints.get(paramsId[i]);
 	}
 	Object o = resolvePath(entryPoint, path);
 	/* Loop on methods with the same name and try all of them */
