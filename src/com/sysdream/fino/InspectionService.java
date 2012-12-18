@@ -41,9 +41,12 @@ public class InspectionService
 	 * Add the default entry points to the list
 	 */
 	if(!entryPoints.contains(true)) {
+        /*
 	    entryPoints.add(false);
 	    entryPoints.add(true);
 	    entryPoints.add("Hello, world!");
+        */
+        entryPoints.add(this.getApplication());
 	}
 	/*
 	 * Register the ActivityLifecycleCallback for entry points automatic
