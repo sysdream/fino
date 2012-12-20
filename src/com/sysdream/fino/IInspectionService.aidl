@@ -330,57 +330,15 @@ interface IInspectionService
 	 in int[] path);
 
     /**
-     * List available macros.
-     *
-     * @return list of macro names
-     */
-    String[] listMacros
-	();
-
-    /**
-     * List macros compatible with the referenced object.
-     *
-     * @param entryPoint the reference entry point
-     * @param path the path from entry point
-     * @return list of compatible macro indexes
-     */
-    int[] filterMacros
-	(in int entryPoint,
-	 in int[] path);
-
-    /**
-     * List macro parameters.
-     *
-     * @param macro the macro index from the macro list
-     * @return list of macro parameter names and types
-     */
-    String[] getMacroParams
-	(in int macro);
-
-    /**
-     * Run the specified macro.
-     *
-     * @param entryPoint the reference entry point
-     * @param path the path from entry point
-     * @param macro the macro index from macro list
-     * @param params a list of parameter index from the entry point list
-     * @return index of the result as an index from the entry point list
-     */
-    int runMacro
-	(in int entryPoint,
-	 in int[] path,
-	 in int macro,
-	 in int[] params);
-
-    /**
      * Load a new macro;
      *
      * Load a macro from a remote application. The macro must be sent
      * as a loadable dex class implementing the <code>IMacro</code>
      * interface. The string must be base64 encoded.
      * @param macro the loaded macro
+     * @return index of the newly created entrypoint
      */
-    void loadMacro
+    int loadMacro
 	(in String name,
-	 in byte[] dex);
+	 in String dex);
 }
