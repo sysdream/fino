@@ -36,18 +36,35 @@ public class InspectionService
     public void onCreate
 	()
     {
+    File dex_dir = null;
+    File outdex_dir = null;
+
 	super.onCreate();
-	/*
-	 * Add the default entry points to the list
-	 */
-	if(!entryPoints.contains(true)) {
+    /*
+     * Flush macro files and optimized dex files
+     */
+    dex_dir = new File(getDir("dex", Context.MODE_PRIVATE).getAbsolutePath());
+    for (File f : dex_dir.listFiles()) {
+        if (f.isFile())
+            f.delete();
+    }
+    outdex_dir = new File(this.getDir("outdex", Context.MODE_PRIVATE).getAbsolutePath());
+    for (File f : outdex_dir.listFiles()) {
+        if (f.isFile())
+            f.delete();
+    }
+
+    /*
+     * Add the default entry points to the list
+     */
+    if(!entryPoints.contains(true)) {
         /*
-	    entryPoints.add(false);
-	    entryPoints.add(true);
-	    entryPoints.add("Hello, world!");
+        entryPoints.add(false);
+        entryPoints.add(true);
+        entryPoints.add("Hello, world!");
         */
         entryPoints.add(this.getApplication());
-	}
+    }
 	/*
 	 * Register the ActivityLifecycleCallback for entry points automatic
 	 * discovery.
@@ -130,20 +147,21 @@ public class InspectionService
 	/*
 	 * Class loader for dynamic macro loading
 	 */
+    /*
 	final File internal = new File
-	    (getDir("dex", Context.MODE_PRIVATE), "macros.dx");
+	    (getDir("dex", Context.MODE_PRIVATE), "macros.jar");
 	final File optimized = getDir("outdex", Context.MODE_PRIVATE);
 	DexClassLoader loader = new DexClassLoader
 	    (internal.getAbsolutePath(),
 	     optimized.getAbsolutePath(),
 	     null,
 	     getClassLoader());
+    */
 	/*
 	 * Initializing the actual service
 	 */
 	return new InspectionStub
 	    (entryPoints,
-	     internal,
-	     loader);
+	     getApplicationContext());
     }
 }

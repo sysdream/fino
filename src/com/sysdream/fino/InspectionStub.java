@@ -4,7 +4,9 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import android.content.Context;
 import android.util.Log;
+import android.util.Base64;
 import android.os.RemoteException;
 import android.os.Handler;
 import android.os.Looper;
@@ -33,11 +35,6 @@ public class InspectionStub
     private ArrayList<Object> entryPoints;
 
     /**
-     * List of available macro instances
-     */
-    private ArrayList<IMacro> macros = new ArrayList<IMacro>();
-
-    /**
      * Dex macros storage path
      */
     private File dexStorage;
@@ -45,7 +42,7 @@ public class InspectionStub
     /**
      * Dex class loader
      */
-    private DexClassLoader loader;
+    private Context context;
 
     /**
      * UI Handler
@@ -59,12 +56,10 @@ public class InspectionStub
      */
     public InspectionStub
 	(ArrayList<Object> entryPoints,
-	 File dexStorage,
-	 DexClassLoader loader)
+	 Context context)
     {
 	this.entryPoints = entryPoints;
-	this.dexStorage = dexStorage;
-	this.loader = loader;
+	this.context = context;
 	this.handler = new Handler();
     }
 
@@ -363,7 +358,7 @@ public class InspectionStub
 	}
 	return entryPoints.indexOf(o);
     }
-
+    
     /**
      * @see IInspectionService.getEntryPoints
      */
@@ -541,6 +536,9 @@ public class InspectionStub
 	    do {
 		c = c.getSuperclass();
 		result.add(c.getName());
+        /* Add every implemented interfaces */
+        for (Class i: c.getInterfaces())
+            result.add(i.getName());
 	    } while(c != Object.class);
 	}
 	return result.toArray(new String[result.size()]);
@@ -819,101 +817,35 @@ public class InspectionStub
     }
 
     /**
-     * @see IInspectionService.listMacros
-     */
-    public String[] listMacros
-	()
-	throws RemoteException
-    {
-	final Vector<String> result = new Vector<String>();
-	for(final IMacro macro: macros) {
-	    result.add(macro.getClass().getName());
-	}
-	return result.toArray(new String[result.size()]);
-    }
-
-    /**
-     * @see IInspectionService.filterMacros
-     */
-    public int[] filterMacros
-	(final int entryPoint,
-	 final int[] path)
-	throws RemoteException
-    {
-	final Object o = resolvePath(entryPoint, path);
-	final Vector<Integer> compatible = new Vector<Integer>();
-	for(int i = 0; i < macros.size(); i++) {
-	    if(macros.get(i).isCompatible(o)) {
-		compatible.add(i);
-	    }
-	}
-	final int[] result = new int[compatible.size()];
-	for(int i = 0; i < result.length; i++) {
-	    result[i] = compatible.get(i);
-	}
-	return result;
-    }
-
-    /**
-     * @see IInspectionService.getMacrosParams
-     */
-    public String[] getMacroParams
-	(final int macro)
-	throws RemoteException
-    {
-	final Vector<String> result = new Vector<String>();
-	for(final Class<?> param: macros.get(macro).getParameters()) {
-	    result.add(param.getName());
-	}
-	return result.toArray(new String[result.size()]);
-    }
-
-    /**
-     * @see IInspectionService.runMacro
-     */
-    public int runMacro
-	(final int entryPoint,
-	 final int[] path,
-	 final int macro,
-	 final int[] params)
-	throws RemoteException
-    {
-	Object[] p = new Object[params.length];
-	for(int i = 0; i < params.length; i++) {
-	    p[i] = entryPoints.get(params[i]);
-	}
-	return pushObject(macros.get(macro).run
-			  (resolvePath(entryPoint, path), p));
-    }
-
-    /**
      * @see IInspectionService.loadMacro
      */
-    public void loadMacro
+    public int loadMacro
 	(final String name,
-	 final byte[] dex)
+	 final String dex)
 	throws RemoteException
     {
-	/*
-	 * Remove existing macro if updating
-	 */
-	for(IMacro macro: macros) {
-	    if(macro.getClass().getName() == name) {
-		macros.remove(macro);
-	    }
-	}
 	/*
 	 * Then try and load the class
 	 */
 	try {
-	    final FileOutputStream fos = new FileOutputStream(dexStorage);
-	    fos.write(dex);
+        String tmpname = UUID.randomUUID().toString()+".jar";
+        final File internal = new File
+	        (this.context.getDir("dex", Context.MODE_PRIVATE), tmpname);
+	    final File optimized = this.context.getDir("outdex", Context.MODE_PRIVATE);
+	    final FileOutputStream fos = new FileOutputStream(internal);
+	    fos.write(Base64.decode(dex, Base64.DEFAULT));
 	    fos.close();
+	    DexClassLoader loader = new DexClassLoader
+	        (internal.getAbsolutePath(),
+	        optimized.getAbsolutePath(),
+	        null,
+	        this.context.getClassLoader());
 	    Class clazz = loader.loadClass(name);
-	    macros.add((IMacro) clazz.newInstance());
+	    return pushObject(clazz/*(IMacro)clazz.newInstance()*/);
 	}
 	catch(Exception e) {
 	    e.printStackTrace(); //TODO debug
+        return -1;
 	}
     }
 }
