@@ -162,7 +162,6 @@ public class InspectionStub
     }
 
 
-
     /**
      * List every field for an object type.
      *
@@ -173,7 +172,13 @@ public class InspectionStub
 	(Object o)
     {
 	final Vector<Field> result = new Vector<Field>();
-	Class<?> c = o.getClass();
+    /* Handle case object is a class */
+    Class<?> c = null;
+    if (!o.getClass().isAssignableFrom(Class.class))
+	    c = o.getClass();
+    else
+        c = (Class<?>)o;
+    /* List declared fields */
 	while(c != Object.class) {
 	    result.addAll(Arrays.asList(c.getDeclaredFields()));
 	    c = c.getSuperclass();
@@ -205,7 +210,12 @@ public class InspectionStub
 	(Object o)
     {
 	final Vector<Method> result = new Vector<Method>();
-	Class<?> c = o.getClass();
+    Class<?> c = null;
+    if (!o.getClass().isAssignableFrom(Class.class))
+    	c = o.getClass();
+    else
+        c = (Class<?>)o;
+    /* Get methods */
 	while(c != Object.class) {
 	    result.addAll(Arrays.asList(c.getDeclaredMethods()));
 	    c = c.getSuperclass();
@@ -687,6 +697,7 @@ public class InspectionStub
         else
 	        params[i] = entryPoints.get(paramsId[i]);
 	}
+    
 	Object o = resolvePath(entryPoint, path);
 	/* Loop on methods with the same name and try all of them */
 	for (Method m : listMethods(o)) {
