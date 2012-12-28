@@ -179,10 +179,9 @@ public class InspectionStub
 	else
 	    c = (Class<?>)o;
 	/* List declared fields */
-	do {
+	for(; c != null; c = c.getSuperclass()) {
 	    result.addAll(Arrays.asList(c.getDeclaredFields()));
-	    c = c.getSuperclass();
-	} while (c != Object.class);
+	}
 	return result;
     }
 
@@ -210,16 +209,15 @@ public class InspectionStub
 	(Object o)
     {
 	final Vector<Method> result = new Vector<Method>();
-    Class<?> c = null;
-    if (!o.getClass().isAssignableFrom(Class.class))
-    	c = o.getClass();
-    else
-        c = (Class<?>)o;
-    /* Get methods */
-	do {
+	Class<?> c = null;
+	if (!o.getClass().isAssignableFrom(Class.class))
+	    c = o.getClass();
+	else
+	    c = (Class<?>)o;
+	/* Get methods */
+	for(; c != null; c = c.getSuperclass()) {
 	    result.addAll(Arrays.asList(c.getDeclaredMethods()));
-	    c = c.getSuperclass();
-	} while(c != Object.class);
+	}
 	return result;
     }
 
@@ -247,10 +245,9 @@ public class InspectionStub
 	(Class clazz)
     {
 	final Vector<Constructor> result = new Vector<Constructor>();
-	do {
+	for(; clazz != null; clazz = clazz.getSuperclass()) {
 	    result.addAll(Arrays.asList(clazz.getConstructors()));
-	    clazz = clazz.getSuperclass();
-	} while (clazz != Object.class);
+	}
 	return result;
     }
 
@@ -284,10 +281,9 @@ public class InspectionStub
     {
 	final Vector<Class> result = new Vector<Class>();
 	Class<?> c = o.getClass();
-	do {
+	for(; c != null; c = c.getSuperclass()) {
 	    result.addAll(Arrays.asList(c.getDeclaredClasses()));
-	    c = c.getSuperclass();
-	} while(c != Object.class);
+	}
 	return result;
     }
 
@@ -543,13 +539,12 @@ public class InspectionStub
 	else {
 	    Class<?> c = o.getClass();
 	    result.add(c.getName());
-	    do {
-		c = c.getSuperclass();
+	    for(; c != null; c = c.getSuperclass()) {
 		result.add(c.getName());
 		/* Add every implemented interfaces */
 		for (Class i: c.getInterfaces())
 		    result.add(i.getName());
-	    } while(c != Object.class);
+	    }
 	}
 	return result.toArray(new String[result.size()]);
     }
