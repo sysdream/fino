@@ -172,17 +172,17 @@ public class InspectionStub
 	(Object o)
     {
 	final Vector<Field> result = new Vector<Field>();
-    /* Handle case object is a class */
-    Class<?> c = null;
-    if (!o.getClass().isAssignableFrom(Class.class))
+	/* Handle case object is a class */
+	Class<?> c = null;
+	if (!o.getClass().isAssignableFrom(Class.class))
 	    c = o.getClass();
-    else
-        c = (Class<?>)o;
-    /* List declared fields */
-	while(c != Object.class) {
+	else
+	    c = (Class<?>)o;
+	/* List declared fields */
+	do {
 	    result.addAll(Arrays.asList(c.getDeclaredFields()));
 	    c = c.getSuperclass();
-	}
+	} while (c != Object.class);
 	return result;
     }
 
@@ -216,10 +216,10 @@ public class InspectionStub
     else
         c = (Class<?>)o;
     /* Get methods */
-	while(c != Object.class) {
+	do {
 	    result.addAll(Arrays.asList(c.getDeclaredMethods()));
 	    c = c.getSuperclass();
-	}
+	} while(c != Object.class);
 	return result;
     }
 
@@ -247,10 +247,10 @@ public class InspectionStub
 	(Class clazz)
     {
 	final Vector<Constructor> result = new Vector<Constructor>();
-	while (clazz != Object.class) {
+	do {
 	    result.addAll(Arrays.asList(clazz.getConstructors()));
 	    clazz = clazz.getSuperclass();
-	}
+	} while (clazz != Object.class);
 	return result;
     }
 
@@ -284,10 +284,10 @@ public class InspectionStub
     {
 	final Vector<Class> result = new Vector<Class>();
 	Class<?> c = o.getClass();
-	while(c != Object.class) {
+	do {
 	    result.addAll(Arrays.asList(c.getDeclaredClasses()));
 	    c = c.getSuperclass();
-	}
+	} while(c != Object.class);
 	return result;
     }
 
@@ -546,9 +546,9 @@ public class InspectionStub
 	    do {
 		c = c.getSuperclass();
 		result.add(c.getName());
-        /* Add every implemented interfaces */
-        for (Class i: c.getInterfaces())
-            result.add(i.getName());
+		/* Add every implemented interfaces */
+		for (Class i: c.getInterfaces())
+		    result.add(i.getName());
 	    } while(c != Object.class);
 	}
 	return result.toArray(new String[result.size()]);
