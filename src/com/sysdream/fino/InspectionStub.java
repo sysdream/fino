@@ -259,7 +259,7 @@ public class InspectionStub
      * @return a list of <code>Constructor</code> objects
      */
     private Vector<Constructor> listConstructors
-    (String className)
+	(String className)
     {
         try {
             Class<?> c = Class.forName(className);
@@ -277,7 +277,7 @@ public class InspectionStub
      * @return the list of classes declared by the object
      */
     private Vector<Class> listClasses
-    (Object o)
+	(Object o)
     {
 	final Vector<Class> result = new Vector<Class>();
 	Class<?> c = o.getClass();
@@ -364,7 +364,7 @@ public class InspectionStub
 	}
 	return entryPoints.indexOf(o);
     }
-    
+
     /**
      * @see IInspectionService.getEntryPoints
      */
@@ -467,7 +467,7 @@ public class InspectionStub
      */
     public int newInstance
 	(final int entryPoint,
-     final int[] path,
+	 final int[] path,
 	 final int[] paramsId)
     {
 	Object o = null;
@@ -554,7 +554,7 @@ public class InspectionStub
      * @see IInspectionService.getClass
      */
     public int getClass
-    (final String className)
+	(final String className)
     {
         try {
             Class<?> c = Class.forName(className);
@@ -589,14 +589,14 @@ public class InspectionStub
 	if(path.length > 0) {
 	    final int[] parent = new int[path.length - 1];
 	    System.arraycopy(path, 0, parent, 0, parent.length);
-        if (value >= 0)
+	    if (value >= 0)
 	        set(browsePath(entryPoint, path).get(parent.length),
 		    resolvePath(entryPoint, parent),
-	    	entryPoints.get(value));
-        else
-            set(browsePath(entryPoint, path).get(parent.length),
-            resolvePath(entryPoint, parent),
-            null);
+		    entryPoints.get(value));
+	    else
+		set(browsePath(entryPoint, path).get(parent.length),
+		    resolvePath(entryPoint, parent),
+		    null);
 	}
     }
 
@@ -659,9 +659,9 @@ public class InspectionStub
 	m.setAccessible(true);
 	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
-        if (paramsId[i]<0)
-            params[i] = null;
-        else
+	    if (paramsId[i]<0)
+		params[i] = null;
+	    else
 	        params[i] = entryPoints.get(paramsId[i]);
 	}
 	/*
@@ -687,12 +687,12 @@ public class InspectionStub
 	/* Build the parameters objects */
 	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
-        if (paramsId[i]<0)
-            params[i] = null;
-        else
+	    if (paramsId[i]<0)
+		params[i] = null;
+	    else
 	        params[i] = entryPoints.get(paramsId[i]);
 	}
-    
+
 	Object o = resolvePath(entryPoint, path);
 	/* Loop on methods with the same name and try all of them */
 	for (Method m : listMethods(o)) {
@@ -834,8 +834,8 @@ public class InspectionStub
 	 * Then try and load the class
 	 */
 	try {
-        String tmpname = UUID.randomUUID().toString()+".jar";
-        final File internal = new File
+	    String tmpname = UUID.randomUUID().toString()+".jar";
+	    final File internal = new File
 	        (this.context.getDir("dex", Context.MODE_PRIVATE), tmpname);
 	    final File optimized = this.context.getDir("outdex", Context.MODE_PRIVATE);
 	    final FileOutputStream fos = new FileOutputStream(internal);
@@ -843,15 +843,15 @@ public class InspectionStub
 	    fos.close();
 	    DexClassLoader loader = new DexClassLoader
 	        (internal.getAbsolutePath(),
-	        optimized.getAbsolutePath(),
-	        null,
-	        this.context.getClassLoader());
+		 optimized.getAbsolutePath(),
+		 null,
+		 this.context.getClassLoader());
 	    Class clazz = loader.loadClass(name);
 	    return pushObject(clazz/*(IMacro)clazz.newInstance()*/);
 	}
 	catch(Exception e) {
 	    e.printStackTrace(); //TODO debug
-        return -1;
+	    return -1;
 	}
     }
 }
