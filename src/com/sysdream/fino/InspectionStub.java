@@ -70,7 +70,7 @@ public class InspectionStub
      * @param o the object to read
      * @return the field value if no error
      */
-    private Object get
+    public static Object get
 	(Field f, Object o)
     {
 	try {
@@ -89,7 +89,7 @@ public class InspectionStub
      * @param o the object to modify
      * @param value the new field value
      */
-    private void set
+    public static void set
 	(Field f, Object o, Object value)
     {
 	try {
@@ -168,7 +168,7 @@ public class InspectionStub
      * @param o the object
      * @return a list of <code>Field</code> objects
      */
-    private Vector<Field> listFields
+    public static Vector<Field> listFields
 	(Object o)
     {
 	final Vector<Field> result = new Vector<Field>();
@@ -192,7 +192,7 @@ public class InspectionStub
      * @param path the path from entry point
      * @return a list of <code>Field</code> objects
      */
-    private Vector<Field> listFields
+    public static Vector<Field> listFields
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -205,7 +205,7 @@ public class InspectionStub
      * @param o the object
      * @retunrn a list of <code>Method</code> objects
      */
-    private Vector<Method> listMethods
+    public static Vector<Method> listMethods
 	(Object o)
     {
 	final Vector<Method> result = new Vector<Method>();
@@ -228,7 +228,7 @@ public class InspectionStub
      * @param path the path from entry point
      * @return a list of <code>Method</code> objects
      */
-    private Vector<Method> listMethods
+    public static Vector<Method> listMethods
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -241,7 +241,7 @@ public class InspectionStub
      * @param clazz the class object
      * @return a list of <code>Constructor</code> objects
      */
-    private Vector<Constructor> listConstructors
+    public static Vector<Constructor> listConstructors
 	(Class clazz)
     {
 	final Vector<Constructor> result = new Vector<Constructor>();
@@ -258,7 +258,7 @@ public class InspectionStub
      * @param className the class name
      * @return a list of <code>Constructor</code> objects
      */
-    private Vector<Constructor> listConstructors
+    public static Vector<Constructor> listConstructors
 	(String className)
     {
         try {
@@ -276,7 +276,7 @@ public class InspectionStub
      * @param o the object
      * @return the list of classes declared by the object
      */
-    private Vector<Class> listClasses
+    public static Vector<Class> listClasses
 	(Object o)
     {
 	final Vector<Class> result = new Vector<Class>();
@@ -294,7 +294,7 @@ public class InspectionStub
      * @param path the path from the entry point
      * @return a list of <code>Class</code> objects
      */
-    private Vector<Class> listClasses
+    public static Vector<Class> listClasses
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -308,7 +308,7 @@ public class InspectionStub
      * @param path the path
      * @return list of browsed fields
      */
-    private Vector<Field> browsePath
+    public static Vector<Field> browsePath
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -329,7 +329,7 @@ public class InspectionStub
      * @param path the path
      * @return the referenced object
      */
-    private Object resolvePath
+    public static Object resolvePath
 	(final int entryPoint,
 	 final int[] path)
     {
