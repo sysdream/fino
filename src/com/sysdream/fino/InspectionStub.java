@@ -70,7 +70,7 @@ public class InspectionStub
      * @param o the object to read
      * @return the field value if no error
      */
-    private Object get
+    public static Object get
 	(Field f, Object o)
     {
 	try {
@@ -89,7 +89,7 @@ public class InspectionStub
      * @param o the object to modify
      * @param value the new field value
      */
-    private void set
+    public static void set
 	(Field f, Object o, Object value)
     {
 	try {
@@ -168,7 +168,7 @@ public class InspectionStub
      * @param o the object
      * @return a list of <code>Field</code> objects
      */
-    private Vector<Field> listFields
+    public static Vector<Field> listFields
 	(Object o)
     {
 	final Vector<Field> result = new Vector<Field>();
@@ -179,10 +179,9 @@ public class InspectionStub
 	else
 	    c = (Class<?>)o;
 	/* List declared fields */
-	do {
+	for(; c != null; c = c.getSuperclass()) {
 	    result.addAll(Arrays.asList(c.getDeclaredFields()));
-	    c = c.getSuperclass();
-	} while (c != Object.class);
+	}
 	return result;
     }
 
@@ -193,7 +192,7 @@ public class InspectionStub
      * @param path the path from entry point
      * @return a list of <code>Field</code> objects
      */
-    private Vector<Field> listFields
+    public static Vector<Field> listFields
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -206,20 +205,19 @@ public class InspectionStub
      * @param o the object
      * @retunrn a list of <code>Method</code> objects
      */
-    private Vector<Method> listMethods
+    public static Vector<Method> listMethods
 	(Object o)
     {
 	final Vector<Method> result = new Vector<Method>();
-    Class<?> c = null;
-    if (!o.getClass().isAssignableFrom(Class.class))
-    	c = o.getClass();
-    else
-        c = (Class<?>)o;
-    /* Get methods */
-	do {
+	Class<?> c = null;
+	if (!o.getClass().isAssignableFrom(Class.class))
+	    c = o.getClass();
+	else
+	    c = (Class<?>)o;
+	/* Get methods */
+	for(; c != null; c = c.getSuperclass()) {
 	    result.addAll(Arrays.asList(c.getDeclaredMethods()));
-	    c = c.getSuperclass();
-	} while(c != Object.class);
+	}
 	return result;
     }
 
@@ -230,7 +228,7 @@ public class InspectionStub
      * @param path the path from entry point
      * @return a list of <code>Method</code> objects
      */
-    private Vector<Method> listMethods
+    public static Vector<Method> listMethods
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -243,14 +241,13 @@ public class InspectionStub
      * @param clazz the class object
      * @return a list of <code>Constructor</code> objects
      */
-    private Vector<Constructor> listConstructors
+    public static Vector<Constructor> listConstructors
 	(Class clazz)
     {
 	final Vector<Constructor> result = new Vector<Constructor>();
-	do {
+	for(; clazz != null; clazz = clazz.getSuperclass()) {
 	    result.addAll(Arrays.asList(clazz.getConstructors()));
-	    clazz = clazz.getSuperclass();
-	} while (clazz != Object.class);
+	}
 	return result;
     }
 
@@ -261,8 +258,8 @@ public class InspectionStub
      * @param className the class name
      * @return a list of <code>Constructor</code> objects
      */
-    private Vector<Constructor> listConstructors
-    (String className)
+    public static Vector<Constructor> listConstructors
+	(String className)
     {
         try {
             Class<?> c = Class.forName(className);
@@ -279,15 +276,14 @@ public class InspectionStub
      * @param o the object
      * @return the list of classes declared by the object
      */
-    private Vector<Class> listClasses
-    (Object o)
+    public static Vector<Class> listClasses
+	(Object o)
     {
 	final Vector<Class> result = new Vector<Class>();
 	Class<?> c = o.getClass();
-	do {
+	for(; c != null; c = c.getSuperclass()) {
 	    result.addAll(Arrays.asList(c.getDeclaredClasses()));
-	    c = c.getSuperclass();
-	} while(c != Object.class);
+	}
 	return result;
     }
 
@@ -298,7 +294,7 @@ public class InspectionStub
      * @param path the path from the entry point
      * @return a list of <code>Class</code> objects
      */
-    private Vector<Class> listClasses
+    public static Vector<Class> listClasses
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -312,7 +308,7 @@ public class InspectionStub
      * @param path the path
      * @return list of browsed fields
      */
-    private Vector<Field> browsePath
+    public static Vector<Field> browsePath
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -333,7 +329,7 @@ public class InspectionStub
      * @param path the path
      * @return the referenced object
      */
-    private Object resolvePath
+    public static Object resolvePath
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -368,7 +364,7 @@ public class InspectionStub
 	}
 	return entryPoints.indexOf(o);
     }
-    
+
     /**
      * @see IInspectionService.getEntryPoints
      */
@@ -471,7 +467,7 @@ public class InspectionStub
      */
     public int newInstance
 	(final int entryPoint,
-     final int[] path,
+	 final int[] path,
 	 final int[] paramsId)
     {
 	Object o = null;
@@ -546,13 +542,12 @@ public class InspectionStub
 	else {
 	    Class<?> c = o.getClass();
 	    result.add(c.getName());
-	    do {
-		c = c.getSuperclass();
+	    for(; c != null; c = c.getSuperclass()) {
 		result.add(c.getName());
 		/* Add every implemented interfaces */
 		for (Class i: c.getInterfaces())
 		    result.add(i.getName());
-	    } while(c != Object.class);
+	    }
 	}
 	return result.toArray(new String[result.size()]);
     }
@@ -562,7 +557,7 @@ public class InspectionStub
      * @see IInspectionService.getClass
      */
     public int getClass
-    (final String className)
+	(final String className)
     {
         try {
             Class<?> c = Class.forName(className);
@@ -597,14 +592,14 @@ public class InspectionStub
 	if(path.length > 0) {
 	    final int[] parent = new int[path.length - 1];
 	    System.arraycopy(path, 0, parent, 0, parent.length);
-        if (value >= 0)
+	    if (value >= 0)
 	        set(browsePath(entryPoint, path).get(parent.length),
 		    resolvePath(entryPoint, parent),
-	    	entryPoints.get(value));
-        else
-            set(browsePath(entryPoint, path).get(parent.length),
-            resolvePath(entryPoint, parent),
-            null);
+		    entryPoints.get(value));
+	    else
+		set(browsePath(entryPoint, path).get(parent.length),
+		    resolvePath(entryPoint, parent),
+		    null);
 	}
     }
 
@@ -667,9 +662,9 @@ public class InspectionStub
 	m.setAccessible(true);
 	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
-        if (paramsId[i]<0)
-            params[i] = null;
-        else
+	    if (paramsId[i]<0)
+		params[i] = null;
+	    else
 	        params[i] = entryPoints.get(paramsId[i]);
 	}
 	/*
@@ -695,12 +690,12 @@ public class InspectionStub
 	/* Build the parameters objects */
 	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
-        if (paramsId[i]<0)
-            params[i] = null;
-        else
+	    if (paramsId[i]<0)
+		params[i] = null;
+	    else
 	        params[i] = entryPoints.get(paramsId[i]);
 	}
-    
+
 	Object o = resolvePath(entryPoint, path);
 	/* Loop on methods with the same name and try all of them */
 	for (Method m : listMethods(o)) {
@@ -842,8 +837,8 @@ public class InspectionStub
 	 * Then try and load the class
 	 */
 	try {
-        String tmpname = UUID.randomUUID().toString()+".jar";
-        final File internal = new File
+	    String tmpname = UUID.randomUUID().toString()+".jar";
+	    final File internal = new File
 	        (this.context.getDir("dex", Context.MODE_PRIVATE), tmpname);
 	    final File optimized = this.context.getDir("outdex", Context.MODE_PRIVATE);
 	    final FileOutputStream fos = new FileOutputStream(internal);
@@ -851,15 +846,15 @@ public class InspectionStub
 	    fos.close();
 	    DexClassLoader loader = new DexClassLoader
 	        (internal.getAbsolutePath(),
-	        optimized.getAbsolutePath(),
-	        null,
-	        this.context.getClassLoader());
+		 optimized.getAbsolutePath(),
+		 null,
+		 this.context.getClassLoader());
 	    Class clazz = loader.loadClass(name);
 	    return pushObject(clazz/*(IMacro)clazz.newInstance()*/);
 	}
 	catch(Exception e) {
 	    e.printStackTrace(); //TODO debug
-        return -1;
+	    return -1;
 	}
     }
 }
