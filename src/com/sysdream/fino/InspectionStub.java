@@ -477,7 +477,10 @@ public class InspectionStub
 	Object o = null;
 	final Object[] params = new Object[paramsId.length];
 	for(int i = 0; i < params.length; i++) {
-	    params[i] = entryPoints.get(paramsId[i]);
+        if (paramsId[i] < 0)
+            params[i] = null;
+        else
+	        params[i] = entryPoints.get(paramsId[i]);
 	}
 	/* List constructors */
 	for(final Constructor c: listConstructors((Class<?>)resolvePath(entryPoint, path))) {
