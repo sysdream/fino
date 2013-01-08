@@ -168,7 +168,7 @@ public class InspectionStub
      * @param o the object
      * @return a list of <code>Field</code> objects
      */
-    public static Vector<Field> listFields
+    public Vector<Field> listFields
 	(Object o)
     {
 	final Vector<Field> result = new Vector<Field>();
@@ -192,7 +192,7 @@ public class InspectionStub
      * @param path the path from entry point
      * @return a list of <code>Field</code> objects
      */
-    public static Vector<Field> listFields
+    public Vector<Field> listFields
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -228,7 +228,7 @@ public class InspectionStub
      * @param path the path from entry point
      * @return a list of <code>Method</code> objects
      */
-    public static Vector<Method> listMethods
+    public Vector<Method> listMethods
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -241,7 +241,7 @@ public class InspectionStub
      * @param clazz the class object
      * @return a list of <code>Constructor</code> objects
      */
-    public static Vector<Constructor> listConstructors
+    public Vector<Constructor> listConstructors
 	(Class clazz)
     {
 	final Vector<Constructor> result = new Vector<Constructor>();
@@ -258,7 +258,7 @@ public class InspectionStub
      * @param className the class name
      * @return a list of <code>Constructor</code> objects
      */
-    public static Vector<Constructor> listConstructors
+    public Vector<Constructor> listConstructors
 	(String className)
     {
         try {
@@ -276,7 +276,7 @@ public class InspectionStub
      * @param o the object
      * @return the list of classes declared by the object
      */
-    public static Vector<Class> listClasses
+    public Vector<Class> listClasses
 	(Object o)
     {
 	final Vector<Class> result = new Vector<Class>();
@@ -294,7 +294,7 @@ public class InspectionStub
      * @param path the path from the entry point
      * @return a list of <code>Class</code> objects
      */
-    public static Vector<Class> listClasses
+    public Vector<Class> listClasses
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -308,7 +308,7 @@ public class InspectionStub
      * @param path the path
      * @return list of browsed fields
      */
-    public static Vector<Field> browsePath
+    public Vector<Field> browsePath
 	(final int entryPoint,
 	 final int[] path)
     {
@@ -329,7 +329,7 @@ public class InspectionStub
      * @param path the path
      * @return the referenced object
      */
-    public static Object resolvePath
+    public Object resolvePath
 	(final int entryPoint,
 	 final int[] path)
     {
