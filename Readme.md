@@ -9,8 +9,22 @@ How to install
 1. Clone all the required git repos (fino, gadget and gadget-client) available on Sysdream's Github
 2. Make sure apktool, jarsigner and sed are installed and available in your environment
 3. Make sure fino/inject.sh script is chmod +x
-4. Take any APK file, and inject Fino's minimal service using fino/inject.sh script like this: ./fino/inject.sh my-original.apk dest-app-with-fino.apk
-5. Install the APK inside an emulator or in your phone using adb or a file manager: adb install dest-app-with-fino.apk. If you use adb, no matter if "Accept unknown sources" option is enabled, it will install the app. Check this option if you install it from a file manager.
+4. Make sure you have your Android debug keystore available in ~/.android/debug.keystore. If not, create it:
+
+       keytool -genkey -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android -keyalg RSA -validity 14000
+  
+   (use any values for the certificate)
+
+5. Take any APK file, and inject Fino's minimal service using fino/inject.sh script like this: 
+    
+       cd fino
+       ./inject.sh my-original.apk dest-app-with-fino.apk
+
+6. Install the APK inside an emulator or in your phone using adb or a file manager: 
+
+       adb install dest-app-with-fino.apk.
+   
+   If you use adb, no matter if "Accept unknown sources" option is enabled, it will install the app. Check this option if you install it from a file manager.
 
 You have successfully injected Fino's service inside an existing APK and drop the patched version of it into an Android device.
 Let setup Gadget now.
