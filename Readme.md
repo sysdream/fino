@@ -11,18 +11,18 @@ How to install
 3. Make sure fino/inject.sh script is chmod +x
 4. Make sure you have your Android debug keystore available in ~/.android/debug.keystore. If not, create it:
 
-       keytool -genkey -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android -keyalg RSA -validity 14000
+        keytool -genkey -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android -keyalg RSA -validity 14000
   
    (use any values for the certificate)
 
 5. Take any APK file, and inject Fino's minimal service using fino/inject.sh script like this: 
     
-       cd fino
-       ./inject.sh my-original.apk dest-app-with-fino.apk
+        cd fino
+        ./inject.sh my-original.apk dest-app-with-fino.apk
 
 6. Install the APK inside an emulator or in your phone using adb or a file manager: 
 
-       adb install dest-app-with-fino.apk.
+        adb install dest-app-with-fino.apk.
    
    If you use adb, no matter if "Accept unknown sources" option is enabled, it will install the app. Check this option if you install it from a file manager.
 
@@ -31,7 +31,11 @@ Let setup Gadget now.
 
 1. Compile and install the Gadget application on the Android device (we will provide a clean APK later, for the moment simply use ant to build it and install it). If cxompilation does not work, use the gadget.apk file we dropped in the repo.
 2. Launch Gadget, it will start a background service handling every TCP clients
-3. With adb, forward a local port of your computer to the android device (if you are using a real phone, you're supposed to have it connected via USB): adb forward tcp:1234 tcp:4444. You can set the port used  by Gadget in its main config screen.
+3. With adb, forward a local port of your computer to the android device (if you are using a real phone, you're supposed to have it connected via USB): 
+
+        adb forward tcp:1234 tcp:4444. 
+   
+   You can set the port used  by Gadget in its main config screen.
 4. In the gadget-client repo, you'll find a shell.py script. Launch it (give every needed parameters, that is local ip, local port and your apk package name).
 5. Enjoy the shell.
 
@@ -51,7 +55,10 @@ Quick tips
 
 Some useful code snippets when dealing with android applications with Fino:
 
-* To get all the running activities of a given application, use this: activities = app.find('android.app.Activity')
+* To get all the running activities of a given application, use this: 
+
+        activities = app.find('android.app.Activity')
+    
 * Auto-completion is provided by pressing <Alt> + <Tab>. 
 * Python's dir() method may be useful to explore objects at runtime but may sometimes not help anymore when facing code obfuscation
 * To refresh a running activity, the Python's Activity class implements a method called refresh() which handles everything
